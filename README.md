@@ -5,6 +5,7 @@
 A fully automated data engineering platform that seamlessly ingests, processes, and analyzes both static and real-time MTA transit data to provide operational insights and performance analytics for NYC's transportation network.
 
 ![image](_workflow_chart.png)
+![image](_streaming_dash.png)
 
 ## 📊 Project Overview
 
