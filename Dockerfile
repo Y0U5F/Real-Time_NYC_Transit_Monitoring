@@ -20,8 +20,8 @@ RUN pip install --upgrade pip --timeout 120 --retries 5 && \
 # Copy project files
 COPY . /app/
 
-# Create directory for batch files
-RUN mkdir -p /app/batch_files
+# Create directory for batch files and data
+RUN mkdir -p /app/data/batch_files
 
 # Expose Prefect UI port
 EXPOSE 4200

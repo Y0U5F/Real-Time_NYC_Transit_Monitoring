@@ -4,8 +4,8 @@
 
 A fully automated data engineering platform that seamlessly ingests, processes, and analyzes both static and real-time MTA transit data to provide operational insights and performance analytics for NYC's transportation network.
 
-![image](_workflow_chart.png)
-![image](_streaming_dash.png)
+![image](docs/images/_workflow_chart.png)
+![image](docs/images/_streaming_dash.png)
 
 ## 📊 Project Overview
 
@@ -52,11 +52,41 @@ MTA data exists in two fundamentally disconnected formats:
 ✅ Low-latency processing for real-time insights  
 ✅ Historical storage for operational analytics  
 
+## 📁 Project Structure
+
+```
+Real-Time_NYC_Transit_Monitoring/
+├── README.md
+├── requirements.txt
+├── Dockerfile
+├── entrypoint.sh
+├── .gitignore
+├── src/
+│   ├── pipeline/
+│   │   ├── orchestrator.py          # Prefect orchestration (main pipeline)
+│   │   ├── ingestion/
+│   │   │   └── gtfs_scrapper.py     # Download GTFS data
+│   │   ├── bronze/
+│   │   │   └── load_to_duckdb.py    # Load to DuckDB (Bronze layer)
+│   │   ├── silver/
+│   │   │   └── dbt_nyc_transit/     # DBT transformations (Silver layer)
+│   │   └── gold/
+│   │       ├── load_to_snowflake.py # Load to Snowflake
+│   │       └── transformation.py    # Star schema creation (Gold layer)
+│   └── utils/
+├── docs/
+│   ├── images/                       # Dashboard and workflow images
+│   └── presentations/                # PDF presentations
+├── config/                            # Configuration files
+└── data/                              # Data files (gitignored)
+    └── batch_files/                   # Downloaded GTFS files
+```
+
 ## 🏗️ Architecture
 
 The pipeline follows a Lambda architecture combining batch and streaming processing:
 
-![image](_workflow_chart.png)
+![image](docs/images/_workflow_chart.png)
 
 
 ### Tech Stack
@@ -105,7 +135,7 @@ The pipeline follows a Lambda architecture combining batch and streaming process
 
 ### 4. Star Schema Design
 
-![image](mta_star_schema.jpeg)
+![image](docs/images/mta_star_schema.jpeg)
 
 
 ### 5. Containerization & Orchestration
@@ -147,8 +177,8 @@ The pipeline follows a Lambda architecture combining batch and streaming process
 
 ## 📊 Dashboards
 
-![image](_batching_dash.png)
-![image](_streaming_dash.png)
+![image](docs/images/_batching_dash.png)
+![image](docs/images/_streaming_dash.png)
 
 ## 💡 Recommendations
 

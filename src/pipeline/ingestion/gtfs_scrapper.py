@@ -4,17 +4,23 @@ import requests
 from pathlib import Path
 
 
-def download_and_extract_gtfs(url, extract_folder="batch_files"):
+def download_and_extract_gtfs(url, extract_folder=None):
     """
     Download zip file from URL and extract contents to specified folder
     
     Args:
         url (str): URL of the zip file to download
-        extract_folder (str): Folder name to extract contents to
+        extract_folder (str, optional): Folder name to extract contents to.
+                                       Defaults to data/batch_files relative to project root
     """
+    if extract_folder is None:
+        # Get project root (3 levels up from this file: src/pipeline/ingestion/gtfs_scrapper.py)
+        project_root = Path(__file__).parent.parent.parent.parent
+        extract_path = project_root / "data" / "batch_files"
+    else:
+        extract_path = Path(extract_folder)
     
     # Create extract folder if it doesn't exist
-    extract_path = Path(extract_folder)
     extract_path.mkdir(exist_ok=True)
     
     print(f"Downloading GTFS data from: {url}")

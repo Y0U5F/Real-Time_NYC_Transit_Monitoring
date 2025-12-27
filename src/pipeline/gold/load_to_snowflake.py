@@ -1,6 +1,7 @@
 import duckdb
 import dlt
 import os
+from pathlib import Path
 
 # 1. Configuration
 os.environ["DESTINATION__SNOWFLAKE__CREDENTIALS__DATABASE"] = "NYC_TRANSIT"
@@ -14,7 +15,7 @@ os.environ["DESTINATION__SNOWFLAKE__CREDENTIALS__HOST"] = "FYHTBNY-UZ80283"
 
 # Helper function to get list of tables from DuckDB
 def get_table_names(db_path):
-    conn = duckdb.connect(db_path, read_only=True)
+    conn = duckdb.connect(str(db_path), read_only=True)
     tables = conn.execute("SHOW TABLES").fetchall()
     conn.close()
     return [t[0] for t in tables]
@@ -23,7 +24,7 @@ def get_table_names(db_path):
 @dlt.resource(write_disposition="replace")
 def load_table_resource(db_path, table_name):
     print(f"   Reading table: {table_name}...")
-    conn = duckdb.connect(db_path, read_only=True)
+    conn = duckdb.connect(str(db_path), read_only=True)
     
     batch_size = 50000 
     offset = 0
@@ -52,9 +53,10 @@ def load_table_resource(db_path, table_name):
 
 def run_pipeline():
     # 3. Setup
-    db_file = 'nyc_transit_bronze.duckdb'
+    project_root = Path(__file__).parent.parent.parent.parent
+    db_file = project_root / 'data' / 'nyc_transit_bronze.duckdb'
     
-    if not os.path.exists(db_file):
+    if not db_file.exists():
         print(f"❌ Error: Database file '{db_file}' not found.")
         return
 
@@ -68,7 +70,7 @@ def run_pipeline():
         dataset_name="raw_data"
     )
 
-    resources = [load_table_resource(db_file, t).with_name(t) for t in tables]
+    resources = [load_table_resource(str(db_file), t).with_name(t) for t in tables]
 
     if resources:
         print("🚀 Starting load to Snowflake...")

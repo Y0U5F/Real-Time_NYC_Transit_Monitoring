@@ -1,20 +1,22 @@
 import duckdb
 import os
 from glob import glob
+from pathlib import Path
 
 def load_to_bronze():
-    # 1. Define paths
-    source_folder = 'batch_files'
-    db_file = 'nyc_transit_bronze.duckdb'
+    # 1. Define paths (relative to project root)
+    project_root = Path(__file__).parent.parent.parent.parent
+    source_folder = project_root / 'data' / 'batch_files'
+    db_file = project_root / 'data' / 'nyc_transit_bronze.duckdb'
 
     # 2. Connect to DuckDB (this creates the file if it doesn't exist)
     # The read_only=False flag allows us to write data
-    con = duckdb.connect(db_file, read_only=False)
+    con = duckdb.connect(str(db_file), read_only=False)
 
     print(f"🔌 Connected to database: {db_file}")
     
     # 3. Get list of all .txt files (GTFS data often uses .txt for CSVs)
-    files = glob(os.path.join(source_folder, "*.txt"))
+    files = glob(str(source_folder / "*.txt"))
 
     if not files:
         print(f"⚠️  No .txt files found in '{source_folder}'. Please check the directory.")

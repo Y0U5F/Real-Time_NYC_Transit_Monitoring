@@ -1,33 +1,39 @@
 import subprocess
+import sys
 from pathlib import Path
 from datetime import timedelta
 from prefect import flow, task
 
-
+# Get project root directory (3 levels up from this file: src/pipeline/orchestrator.py)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 SCRIPTS_DIR = Path(__file__).parent
 
 
 @task(name="Run GTFS Scrapper")
 def run_script_01():
-    subprocess.run(["python", SCRIPTS_DIR / "script01_gtfs_scrapper.py"], check=True)
+    script_path = SCRIPTS_DIR / "ingestion" / "gtfs_scrapper.py"
+    subprocess.run([sys.executable, str(script_path)], check=True, cwd=str(PROJECT_ROOT))
 
 
 @task(name="Load to DuckDB")
 def run_script_02():
-    subprocess.run(["python", SCRIPTS_DIR / "script02_load_to_duckdb.py"], check=True)
+    script_path = SCRIPTS_DIR / "bronze" / "load_to_duckdb.py"
+    subprocess.run([sys.executable, str(script_path)], check=True, cwd=str(PROJECT_ROOT))
 
 
 @task(name="Load to Snowflake")
 def run_script_03():
-    subprocess.run(["python", SCRIPTS_DIR / "script03_load_to_snowflake.py"], check=True)
+    script_path = SCRIPTS_DIR / "gold" / "load_to_snowflake.py"
+    subprocess.run([sys.executable, str(script_path)], check=True, cwd=str(PROJECT_ROOT))
 
 
 @task(name="Run dbt")
 def run_dbt():
     # Run dbt and capture output (dbt has a logging bug that causes exit code 1 even on success)
+    dbt_dir = SCRIPTS_DIR / "silver" / "dbt_nyc_transit"
     result = subprocess.run(
         ["dbt", "run"], 
-        cwd=SCRIPTS_DIR / "dbt_nyc_transit", 
+        cwd=str(dbt_dir), 
         capture_output=True, 
         text=True
     )
@@ -42,7 +48,8 @@ def run_dbt():
 
 @task(name="Python Transformation")
 def run_script_04():
-    subprocess.run(["python", SCRIPTS_DIR / "script04_py_transformation.py"], check=True)
+    script_path = SCRIPTS_DIR / "gold" / "transformation.py"
+    subprocess.run([sys.executable, str(script_path)], check=True, cwd=str(PROJECT_ROOT))
 
 
 @flow(name="NYC Transit Pipeline", log_prints=True)

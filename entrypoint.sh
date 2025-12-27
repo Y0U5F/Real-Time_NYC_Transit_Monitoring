@@ -20,4 +20,4 @@ echo "🌐 Prefect UI available at: http://localhost:4200"
 # Run the main pipeline script
 echo "🏃 Starting NYC Transit Pipeline..."
 cd /app
-python script00_prefect_pipeline.py
+python -m src.pipeline.orchestrator
